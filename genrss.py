@@ -45,8 +45,18 @@ def get_mp3s():
         for post in select(b, 'h3.posttitle a'):
             title = post.text
             href = post['href']
-            for mp3 in links(bs(get(href).text), 'a[title=Download]'):
+            post_page = bs(get(href).text)
+            for mp3 in links(post_page, 'a[title=Download]'):
                 mp3s.append((title, mp3))
+        
+            for soundcloud in select(post_page, 'div[id*="soundcloud"]'):
+                scid = soundcloud['id'].split('-')[1]
+                url = (
+                    'https://api.soundcloud.com/tracks/%s'
+                    '/download?client_id=0f8fdbbaa21a9bd18210986a7dc2d72c' %
+                    scid)
+                mp3s.append((title, url))
+            
     return mp3s
 
 
